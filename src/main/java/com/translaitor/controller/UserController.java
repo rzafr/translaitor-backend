@@ -1,7 +1,9 @@
 package com.translaitor.controller;
 
-import com.translaitor.model.User;
 import com.translaitor.service.UserService;
+import com.translaitor.service.dto.CreateUserDto;
+import com.translaitor.service.dto.GetUserDto;
+import com.translaitor.service.dto.UserDtoConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,13 +20,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserController {
 
     private final UserService userService;
+    private final UserDtoConverter userDtoConverter;
 
     @PostMapping("/user")
-    public ResponseEntity<User> createUser(@RequestBody User newUser) {
+    public ResponseEntity<GetUserDto> createUser(@RequestBody CreateUserDto newUser) {
         try {
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(userService.createUser(newUser));
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(userDtoConverter.convertUserToGetUserDto(userService.createUser(newUser)));
+
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
