@@ -36,4 +36,6 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
+
+    // TODO Combinar registro y login para que registro devuelva también login
 }

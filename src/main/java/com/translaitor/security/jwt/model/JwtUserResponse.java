@@ -1,0 +1,28 @@
+package com.translaitor.security.jwt.model;
+
+import com.translaitor.model.UserRole;
+import com.translaitor.service.dto.GetUserDto;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.Set;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class JwtUserResponse extends GetUserDto {
+
+    private String token;
+
+
+    @Builder(builderMethodName="jwtUserResponseBuilder")
+    public JwtUserResponse(String username, String firstName, String lastName, LocalDate dateOfBirth, String email, String phoneNumber, Set<String> roles, String token) {
+        super(username, firstName, lastName, dateOfBirth, email, phoneNumber, roles);
+        this.token = token;
+    }
+
+}

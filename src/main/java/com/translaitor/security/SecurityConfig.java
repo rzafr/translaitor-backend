@@ -58,8 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-            .csrf()
-                .disable()
+            .cors().and().csrf().disable()
             .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .and()
@@ -67,11 +66,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/users/**").hasRole("USER")
-                .antMatchers(HttpMethod.POST, "/users/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
-                .anyRequest().authenticated();
+                .antMatchers(HttpMethod.OPTIONS, "/auth/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/users/**").permitAll() // Only test
+                .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
+                .antMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+                .and()
+                .formLogin().permitAll();
                 // TODO Revisar captura de este método
 
         // Filter that verifies the token
