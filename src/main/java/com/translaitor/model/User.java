@@ -28,7 +28,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, updatable = false)
+    @Column(unique = true, nullable = false, updatable = false)
     private String username;
 
     private String password;
@@ -42,6 +42,7 @@ public class User implements UserDetails {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Column(nullable = false)
     private String email;
 
     @Column(name = "phone_number")

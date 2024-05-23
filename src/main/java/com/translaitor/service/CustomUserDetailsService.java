@@ -17,4 +17,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         return userService.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No user with username: " + username));
     }
+
+    public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
+        return userService.findById(id)
+                .orElseThrow(()-> new UsernameNotFoundException("No user with ID: " + id));
+
+    }
 }

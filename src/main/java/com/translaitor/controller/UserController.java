@@ -8,11 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -22,7 +21,12 @@ public class UserController {
     private final UserService userService;
     private final UserDtoConverter userDtoConverter;
 
-    @PostMapping("/user")
+    @GetMapping("/users")
+    public List<GetUserDto> getAllUsers() {
+        return userService.findAll();
+    }
+
+    @PostMapping("/users")
     public ResponseEntity<GetUserDto> createUser(@RequestBody CreateUserDto newUser) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)

@@ -20,22 +20,32 @@ public class ApiErrorAttributes extends DefaultErrorAttributes {
         Map<String, Object> allErrorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
 
         Map<String, Object> errorAttributes = new HashMap<>();
-        int statusCode = (int) allErrorAttributes.get("status");
-        errorAttributes.put("status", HttpStatus.valueOf(statusCode));
+
+        if (allErrorAttributes.containsKey("status") && allErrorAttributes.get("status") != null) {
+            int statusCode = (int) allErrorAttributes.get("status");
+            errorAttributes.put("status", HttpStatus.valueOf(statusCode));
+        } else {
+            errorAttributes.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         errorAttributes.put("date", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 
         String message = "";
-
         Throwable throwable = getError(webRequest);
 
-        if (throwable instanceof ResponseStatusException) {
-            ResponseStatusException responseStatusException = (ResponseStatusException) throwable;
-            message = responseStatusException.getReason() == null ? "" : responseStatusException.getReason();
+        if (throwable != null) {
+            if (throwable instanceof ResponseStatusException) {
+                ResponseStatusException responseStatusException = (ResponseStatusException) throwable;
+                message = responseStatusException.getReason() == null ? "" : responseStatusException.getReason();
+            } else {
+                if (throwable.getCause() != null) {
+                    message = throwable.getCause().getMessage() == null ? throwable.getCause().toString() : throwable.getCause().getMessage();
+                } else {
+                    message = throwable.toString();
+                }
+            }
         } else {
-            if (throwable.getCause() != null)
-                message = throwable.getCause().getMessage() == null ? throwable.getCause().toString() : throwable.getCause().getMessage();
-            else
-                message = throwable.toString();
+            message = "Unexpected error occurred";
         }
 
         errorAttributes.put("message", message);
