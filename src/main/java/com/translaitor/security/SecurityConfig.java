@@ -67,8 +67,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/auth/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/users/**").permitAll() // Only test
+                .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/users").permitAll() // Only test
                 .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
                 .antMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")

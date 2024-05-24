@@ -26,7 +26,7 @@ public class UserController {
         return userService.findAll();
     }
 
-    @PostMapping("/users")
+    @PostMapping("/users/register")
     public ResponseEntity<GetUserDto> createUser(@RequestBody CreateUserDto newUser) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
