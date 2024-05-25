@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -21,12 +22,7 @@ public class UserController {
     private final UserService userService;
     private final UserDtoConverter userDtoConverter;
 
-    @GetMapping("/users")
-    public List<GetUserDto> getAllUsers() {
-        return userService.findAll();
-    }
-
-    @PostMapping("/users/register")
+    @PostMapping("/auth/register")
     public ResponseEntity<GetUserDto> createUser(@RequestBody CreateUserDto newUser) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -38,4 +34,19 @@ public class UserController {
     }
 
     // TODO Combinar registro y login para que registro devuelva también login
+
+    @GetMapping("/users")
+    public List<GetUserDto> getAllUsers() {
+        return userService.findAll();
+    }
+
+    @GetMapping("/users/{username}")
+    public Optional<GetUserDto> getUserByUsername(@PathVariable("username") String username) {
+        return userService.findByUsernameDto(username);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteById(id);
+    }
 }

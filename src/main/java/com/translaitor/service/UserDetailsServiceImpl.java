@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service("userDetailsService")
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserService userService;
 

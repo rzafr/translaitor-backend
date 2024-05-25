@@ -1,6 +1,6 @@
 package com.translaitor.security;
 
-import com.translaitor.security.jwt.JwtAuthorizationFilter;
+import com.translaitor.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
      * Configure authentication
@@ -66,9 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/auth/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/auth/**").permitAll() // Only test
+                .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll() // Only test
+                .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll() // Only test
                 .antMatchers(HttpMethod.GET, "/api/users").permitAll() // Only test
                 .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
                 .antMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
@@ -77,10 +77,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().permitAll();
-                // TODO Revisar captura de este método
+                // TODO Revisar captura de este método, permitir a todos register y demo
 
         // Filter that verifies the token
-        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 

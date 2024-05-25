@@ -1,7 +1,7 @@
 package com.translaitor.security.jwt;
 
 import com.translaitor.model.User;
-import com.translaitor.service.CustomUserDetailsService;
+import com.translaitor.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,10 +20,10 @@ import java.io.IOException;
 @Log
 @Component
 @RequiredArgsConstructor
-public class JwtAuthorizationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider tokenProvider;
-    private final CustomUserDetailsService userDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserDetailsServiceImpl userDetailsService;
 
     /**
      * Filters incoming HTTP requests to authenticate a user based on a JWT token
@@ -40,8 +40,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         try {
             String token = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-                Long userId = tokenProvider.getUserIdFromJWT(token);
+            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+                Long userId = jwtTokenProvider.getUserIdFromJWT(token);
 
                 User user = (User) userDetailsService.loadUserById(userId);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,

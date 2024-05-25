@@ -27,20 +27,6 @@ public class UserService {
     private final UserDtoConverter userDtoConverter;
     private final PasswordEncoder passwordEncoder;
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public List<GetUserDto> findAll() {
-        return userRepository.findAll().stream()
-                .map(userDtoConverter::convertUserToGetUserDto)
-                .collect(Collectors.toList());
-    }
-
     public User createUser(CreateUserDto newUser) {
         if (newUser.getPassword().contentEquals(newUser.getVerifyPassword())) {
             User user = User.builder()
@@ -62,4 +48,36 @@ public class UserService {
             throw new NewUserWithDifferentPasswordsException();
         }
     }
+
+    // TODO CreateUser with roles
+
+    public List<GetUserDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(userDtoConverter::convertUserToGetUserDto)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public Optional<GetUserDto> findByUsernameDto(String username) {
+        return userRepository.findByUsername(username).stream()
+                .map(userDtoConverter::convertUserToGetUserDto)
+                .findFirst();
+    }
+
+    public void delete(User user) {
+        deleteById(user.getId());
+    }
+
+    public void deleteById(Long id) {
+        if (userRepository.existsById(id))
+            userRepository.deleteById(id);
+    }
+
 }
