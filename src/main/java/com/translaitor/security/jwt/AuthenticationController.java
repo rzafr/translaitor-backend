@@ -4,9 +4,12 @@ import com.translaitor.model.User;
 import com.translaitor.model.UserRole;
 import com.translaitor.security.jwt.model.JwtUserResponse;
 import com.translaitor.security.jwt.model.LoginRequest;
+import com.translaitor.service.UserService;
+import com.translaitor.service.dto.CreateUserDto;
 import com.translaitor.service.dto.GetUserDto;
 import com.translaitor.service.dto.UserDtoConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.stream.Collectors;
@@ -28,6 +32,18 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDtoConverter userDtoConverter;
+    private final UserService userService;
+
+    @PostMapping("/auth/register")
+    public ResponseEntity<JwtUserResponse> createUser(@RequestBody CreateUserDto newUser) {
+        try {
+            userDtoConverter.convertUserToGetUserDto(userService.createUser(newUser));
+            LoginRequest loginRequest = new LoginRequest(newUser.getUsername(), newUser.getPassword());
+            return login(loginRequest);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+    }
 
     @PostMapping("/auth/login")
     public ResponseEntity<JwtUserResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -43,8 +59,13 @@ public class AuthenticationController {
         User user = (User) authentication.getPrincipal();
         String jwtToken = jwtTokenProvider.generateToken(authentication);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(convertUserAndTokenToJwtUserResponse(user, jwtToken));
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(convertUserAndTokenToJwtUserResponse(user, jwtToken));
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
 
     }
 
@@ -53,7 +74,6 @@ public class AuthenticationController {
     public GetUserDto me(@AuthenticationPrincipal User user) {
         return userDtoConverter.convertUserToGetUserDto(user);
     }
-
 
     /**
      * Transforms a user entity and the token into a JwtUserResponse object

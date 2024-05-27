@@ -66,19 +66,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/auth/**").permitAll() // Only test
-                .antMatchers(HttpMethod.POST, "/auth/login").permitAll() // Only test
+                .antMatchers(HttpMethod.OPTIONS, "/api/auth/**").permitAll() // Only test
                 .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll() // Only test
-                .antMatchers(HttpMethod.GET, "/api/user/me").permitAll() // Only test
-                .antMatchers(HttpMethod.GET, "/api/users").permitAll() // Only test
-                .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/api/user/me", "/api/users").permitAll() // Only test
+                .antMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "USER")
                 .antMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().permitAll();
-                // TODO Revisar captura de este método, permitir a todos register y demo
+                // TODO Review screenshot, allow everyone to register and demo
 
         // Filter that verifies the token
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

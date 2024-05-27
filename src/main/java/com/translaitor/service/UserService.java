@@ -40,16 +40,15 @@ public class UserService {
                     .roles(Set.of(UserRole.USER))
                     .build();
             try {
+                // TODO Check if the user already exists
                 return userRepository.save(user);
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The username already exists");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The username already exists", ex);
             }
         } else {
             throw new NewUserWithDifferentPasswordsException();
         }
     }
-
-    // TODO CreateUser with roles
 
     public List<GetUserDto> findAll() {
         return userRepository.findAll().stream()
@@ -76,8 +75,7 @@ public class UserService {
     }
 
     public void deleteById(Long id) {
-        if (userRepository.existsById(id))
-            userRepository.deleteById(id);
+        userRepository.findById(id).ifPresent(user -> userRepository.delete(user));
     }
 
 }

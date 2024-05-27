@@ -20,6 +20,17 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper mapper;
 
+    /**
+     * Handles the commencement of an authentication scheme.
+     * This method is triggered when an authentication exception is thrown.
+     * It sets the response status to 401 (Unauthorized) and returns a JSON representation of the error.
+     *
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @param e
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                          AuthenticationException e) throws IOException, ServletException {
