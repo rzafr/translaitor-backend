@@ -25,7 +25,7 @@ import javax.validation.Valid;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -34,10 +34,10 @@ public class AuthenticationController {
     private final UserDtoConverter userDtoConverter;
     private final UserService userService;
 
-    @PostMapping("/auth/register")
+    @PostMapping("/register")
     public ResponseEntity<JwtUserResponse> createUser(@RequestBody CreateUserDto newUser) {
         try {
-            userDtoConverter.convertUserToGetUserDto(userService.createUser(newUser));
+            userService.createUser(newUser);
             LoginRequest loginRequest = new LoginRequest(newUser.getUsername(), newUser.getPassword());
             return login(loginRequest);
         } catch (DataIntegrityViolationException ex) {
@@ -45,7 +45,7 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<JwtUserResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication =
                 authenticationManager.authenticate(
@@ -71,8 +71,8 @@ public class AuthenticationController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/me")
-    public GetUserDto me(@AuthenticationPrincipal User user) {
-        return userDtoConverter.convertUserToGetUserDto(user);
+    public ResponseEntity<GetUserDto> me(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userDtoConverter.convertUserToGetUserDto(user));
     }
 
     /**

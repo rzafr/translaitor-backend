@@ -1,8 +1,11 @@
 package com.translaitor.controller;
 
+import com.translaitor.model.User;
 import com.translaitor.service.UserService;
 import com.translaitor.service.dto.GetUserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,19 +18,30 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')") // Check SecurityConfig.configure()
     @GetMapping("/users")
-    public List<GetUserDto> getAllUsers() {
-        return userService.findAll();
+    public ResponseEntity<List<GetUserDto>> getAllUsers() {
+        return buildResponseOfAList(userService.findAll());
     }
 
     @GetMapping("/users/{username}")
-    public Optional<GetUserDto> getUserByUsername(@PathVariable("username") String username) {
-        return userService.findByUsernameDto(username);
+    public ResponseEntity<GetUserDto> getUserByUsername(@PathVariable("username") String username) {
+        Optional<GetUserDto> getUserDto = userService.findByUsernameDto(username);
+        return !getUserDto.isPresent() ? ResponseEntity.notFound().build() : ResponseEntity.of(getUserDto);
     }
 
     @DeleteMapping("/users/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
+    }
+
+    /**
+     * Build the response from a List<User>
+     * @param list
+     * @return
+     */
+    private ResponseEntity<List<GetUserDto>> buildResponseOfAList(List<GetUserDto> list) {
+        return list.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(list);
     }
 
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 @Builder
 public class GetUserDto {
 
+    private Long id;
     private String username;
     private String firstName;
     private String lastName;

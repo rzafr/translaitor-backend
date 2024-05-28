@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -19,8 +18,8 @@ public class JwtUserResponse extends GetUserDto {
     private String token;
 
     @Builder(builderMethodName="jwtUserResponseBuilder")
-    public JwtUserResponse(String username, String firstName, String lastName, LocalDate dateOfBirth, String email, String phoneNumber, Set<String> roles, String token) {
-        super(username, firstName, lastName, dateOfBirth, email, phoneNumber, roles);
+    public JwtUserResponse(Long id, String username, String firstName, String lastName, LocalDate dateOfBirth, String email, String phoneNumber, Set<String> roles, String token) {
+        super(id, username, firstName, lastName, dateOfBirth, email, phoneNumber, roles);
         this.token = token;
     }
 
