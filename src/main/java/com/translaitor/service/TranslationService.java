@@ -4,7 +4,6 @@ import com.translaitor.model.Translation;
 import com.translaitor.model.User;
 import com.translaitor.repository.TranslationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,5 +18,8 @@ public class TranslationService {
         return translationRepository.findByUser(user);
     }
 
-
+    public Translation save(Translation translation) {
+        translationRepository.save(translation);
+        return translation;
+    }
 }

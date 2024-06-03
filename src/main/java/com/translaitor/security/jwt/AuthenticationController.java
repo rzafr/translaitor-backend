@@ -27,12 +27,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@CrossOrigin(
-        origins = "http://frontend:80",
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-        allowedHeaders = "*",
-        allowCredentials = "true"
-)
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -90,6 +84,7 @@ public class AuthenticationController {
     private JwtUserResponse convertUserAndTokenToJwtUserResponse(User user, String jwtToken) {
         return JwtUserResponse
                 .jwtUserResponseBuilder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())

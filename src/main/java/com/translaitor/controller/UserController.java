@@ -14,12 +14,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(
-        origins = "http://frontend:80",
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-        allowedHeaders = "*",
-        allowCredentials = "true"
-)
 public class UserController {
 
     private final UserService userService;

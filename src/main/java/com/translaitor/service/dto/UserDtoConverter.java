@@ -11,6 +11,7 @@ public class UserDtoConverter {
 
     public GetUserDto convertUserToGetUserDto(User user) {
         return GetUserDto.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())

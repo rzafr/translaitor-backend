@@ -13,12 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(
-        origins = "http://frontend:80",
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-        allowedHeaders = "*",
-        allowCredentials = "true"
-)
 public class TranslationController {
 
     private final TranslationService translationService;
@@ -26,6 +20,12 @@ public class TranslationController {
     @GetMapping("/translations")
     public ResponseEntity<List<Translation>> getAllTranslationsByUser(@AuthenticationPrincipal User user) {
         return buildResponseOfAList(translationService.findAll(user));
+    }
+
+    @PostMapping("/translations")
+    public ResponseEntity<Translation> createTranslation(@RequestBody Translation translation) {
+        translationService.save(translation);
+        return ResponseEntity.ok(translation);
     }
 
     /**
