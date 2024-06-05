@@ -1,6 +1,5 @@
 package com.translaitor.controller;
 
-import com.translaitor.model.User;
 import com.translaitor.service.UserService;
 import com.translaitor.service.dto.GetUserDto;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,7 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')") // Check SecurityConfig.configure()
     @GetMapping("/users")
-    public ResponseEntity<List<GetUserDto>> getAllUsers() {
-        return buildResponseOfAList(userService.findAll());
-    }
+    public ResponseEntity<List<GetUserDto>> getAllUsers() { return buildResponseOfAList(userService.findAll()); }
 
     @GetMapping("/users/{username}")
     public ResponseEntity<GetUserDto> getUserByUsername(@PathVariable("username") String username) {
@@ -30,9 +27,16 @@ public class UserController {
         return !getUserDto.isPresent() ? ResponseEntity.notFound().build() : ResponseEntity.of(getUserDto);
     }
 
+    @PutMapping("/users")
+    public ResponseEntity<GetUserDto> updateUser(@RequestBody GetUserDto userDto) {
+        Optional<GetUserDto> getUserDto = userService.updateUser(userDto);
+        return !getUserDto.isPresent() ? ResponseEntity.notFound().build() : ResponseEntity.of(getUserDto);
+    }
+
     @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         userService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**

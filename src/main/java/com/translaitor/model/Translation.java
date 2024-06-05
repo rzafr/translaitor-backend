@@ -19,12 +19,13 @@ import java.time.LocalDateTime;
 public class Translation {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String sourceLanguage;
     private String targetLanguage;
     private String originalText;
     private String translatedText;
+    private Boolean favorite;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

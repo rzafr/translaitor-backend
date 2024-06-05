@@ -1,4 +1,4 @@
-package com.translaitor.error.exceptions;
+package com.translaitor.exception;
 
 public class NewUserWithDifferentPasswordsException extends RuntimeException {
 

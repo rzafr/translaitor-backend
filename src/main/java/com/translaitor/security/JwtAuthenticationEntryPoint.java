@@ -1,7 +1,7 @@
 package com.translaitor.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.translaitor.error.ApiError;
+import com.translaitor.error.model.impl.ApiErrorImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -38,7 +38,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
         httpServletResponse.setContentType("application/json");
 
-        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, e.getMessage());
+        ApiErrorImpl apiError = new ApiErrorImpl(HttpStatus.UNAUTHORIZED, e.getMessage());
         String strApiError = mapper.writeValueAsString(apiError);
 
         PrintWriter writer = httpServletResponse.getWriter();

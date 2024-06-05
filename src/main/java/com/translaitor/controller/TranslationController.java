@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -18,23 +20,41 @@ public class TranslationController {
     private final TranslationService translationService;
 
     @GetMapping("/translations")
-    public ResponseEntity<List<Translation>> getAllTranslationsByUser(@AuthenticationPrincipal User user) {
-        return buildResponseOfAList(translationService.findAll(user));
+    public List<Translation> getAllTranslations() {
+        return translationService.findAll();
+    }
+
+    @GetMapping("/translations/{id}")
+    public Translation getById(@PathVariable Long id) {
+        return translationService.findById(id);
+    }
+
+    @GetMapping("/translations/user")
+    public List<Translation> getAllTranslationsByUser(@AuthenticationPrincipal User user) {
+        return translationService.findByUser(user);
     }
 
     @PostMapping("/translations")
     public ResponseEntity<Translation> createTranslation(@RequestBody Translation translation) {
-        translationService.save(translation);
-        return ResponseEntity.ok(translation);
+        Translation createdTranslation = translationService.save(translation);
+        URI createdURI = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdTranslation.getId()).toUri();
+
+        return ResponseEntity
+                .created(createdURI)
+                .body(createdTranslation);
     }
 
-    /**
-     * Build the response from a List<Translation>
-     * @param list
-     * @return
-     */
-    private ResponseEntity<List<Translation>> buildResponseOfAList(List<Translation> list) {
-        return list.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(list);
+    @PutMapping("/translations/{id}")
+    public Translation updateTranslation(@PathVariable Long id, @RequestBody Translation updatedTranslation) {
+        return translationService.updateTranslation(id, updatedTranslation);
     }
 
+    @DeleteMapping("/translations/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        translationService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

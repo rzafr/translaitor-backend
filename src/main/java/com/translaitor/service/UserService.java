@@ -1,6 +1,6 @@
 package com.translaitor.service;
 
-import com.translaitor.error.exceptions.NewUserWithDifferentPasswordsException;
+import com.translaitor.exception.NewUserWithDifferentPasswordsException;
 import com.translaitor.model.User;
 import com.translaitor.model.UserRole;
 import com.translaitor.repository.UserRepository;
@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +30,9 @@ public class UserService {
 
     public User createUser(CreateUserDto newUser) {
         if (newUser.getPassword().contentEquals(newUser.getVerifyPassword())) {
+            if (userRepository.existsByUsername(newUser.getUsername())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The username already exists");
+            }
             User user = User.builder()
                     .username(newUser.getUsername())
                     .password(passwordEncoder.encode(newUser.getPassword()))
@@ -40,7 +44,6 @@ public class UserService {
                     .roles(Set.of(UserRole.USER))
                     .build();
             try {
-                // TODO Check if the user already exists
                 return userRepository.save(user);
             } catch (DataIntegrityViolationException ex) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The username already exists", ex);
@@ -68,6 +71,19 @@ public class UserService {
         return userRepository.findByUsername(username).stream()
                 .map(userDtoConverter::convertUserToGetUserDto)
                 .findFirst();
+    }
+
+    public Optional<GetUserDto> updateUser(GetUserDto getUserDto) {
+        User updatedUser = userRepository.findById(getUserDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + getUserDto.getId()));;
+
+        updatedUser.setFirstName(getUserDto.getFirstName());
+        updatedUser.setLastName(getUserDto.getLastName());
+        updatedUser.setDateOfBirth(getUserDto.getDateOfBirth());
+        updatedUser.setEmail(getUserDto.getEmail());
+        updatedUser.setPhoneNumber(getUserDto.getPhoneNumber());
+
+        return Optional.ofNullable(userDtoConverter.convertUserToGetUserDto(userRepository.save(updatedUser)));
     }
 
     public void delete(User user) {
