@@ -4,25 +4,23 @@ import com.translaitor.error.model.impl.ApiErrorImpl;
 import com.translaitor.error.model.impl.ApiValidationSubError;
 import com.translaitor.exception.EmptyTranslationListException;
 import com.translaitor.exception.TranslationNotFoundException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
-public class GlobalRestControllerAdvice {
-
-    /*@ExceptionHandler(NewUserWithDifferentPasswordsException.class)
-    public ResponseEntity<ApiErrorImpl> handleNewUserErrors(Exception ex) {
-        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
+public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
@@ -31,18 +29,14 @@ public class GlobalRestControllerAdvice {
         return ResponseEntity.status(status).headers(headers).body(apiError);
     }
 
-    private ResponseEntity<ApiErrorImpl> buildErrorResponseEntity(HttpStatus status, String message) {
-        return ResponseEntity.status(status)
-                .body(ApiErrorImpl.builder()
-                        .status(status)
-                        .message(message)
-                        .build());
-
-    }*/
-
     @ExceptionHandler({TranslationNotFoundException.class, EmptyTranslationListException.class})
     public ResponseEntity<?> handleNotFoundException(EntityNotFoundException exception, WebRequest request) {
         return buildApiError(exception.getMessage(), request, HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return buildApiErrorWithSubErrors("Validation error. Please check the sublist.", request, status, ex.getAllErrors());
     }
 
     private final ResponseEntity<Object> buildApiError(String message, WebRequest request, HttpStatus status) {
@@ -70,8 +64,6 @@ public class GlobalRestControllerAdvice {
                                         .collect(Collectors.toList())
                                 )
                                 .build()
-                        // TODO Combinar con el anterior
                 );
-
     }
 }

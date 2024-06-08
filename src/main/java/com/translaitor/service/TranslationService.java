@@ -5,9 +5,17 @@ import com.translaitor.exception.TranslationNotFoundException;
 import com.translaitor.model.Translation;
 import com.translaitor.model.User;
 import com.translaitor.repository.TranslationRepository;
+import com.translaitor.repository.UserRepository;
+import com.translaitor.service.dto.translation.CreateTranslationDto;
+import com.translaitor.service.dto.translation.UpdateTranslationDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -15,6 +23,7 @@ import java.util.List;
 public class TranslationService {
 
     private final TranslationRepository translationRepository;
+    private final UserRepository userRepository;
 
     public List<Translation> findAll() {
         List<Translation> result = translationRepository.findAll();
@@ -37,19 +46,36 @@ public class TranslationService {
                 .orElseThrow(() -> new TranslationNotFoundException(id));
     }
 
-    public Translation save(Translation translation) { return translationRepository.save(translation); }
+    @Transactional
+    public Translation save(CreateTranslationDto newTranslation) {
+        User user = null;
+        if (newTranslation.getUser() != null && newTranslation.getUser().getId() != null) {
+            user = userRepository.findById(newTranslation.getUser().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        }
+        Translation translation = Translation.builder()
+                .sourceLanguage(newTranslation.getSourceLanguage())
+                .targetLanguage(newTranslation.getTargetLanguage())
+                .originalText(newTranslation.getOriginalText())
+                .translatedText(newTranslation.getTranslatedText())
+                .favorite(newTranslation.getFavorite())
+                .user(user)
+                .build();
+        try {
+            return translationRepository.save(translation);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error saving translation", ex);
+        }
 
-    public Translation updateTranslation(Long id, Translation updatedTranslation) {
-        return translationRepository.findById(id)
+    }
+
+    public Translation updateTranslation(UpdateTranslationDto updatedTranslation) {
+        return translationRepository.findById(updatedTranslation.getId())
                 .map(translation -> {
-                    translation.setSourceLanguage(updatedTranslation.getSourceLanguage());
-                    translation.setTargetLanguage(updatedTranslation.getTargetLanguage());
-                    translation.setOriginalText(updatedTranslation.getOriginalText());
-                    translation.setTranslatedText(updatedTranslation.getTranslatedText());
                     translation.setFavorite(updatedTranslation.getFavorite());
                     return translationRepository.save(translation);
                 })
-                .orElseThrow(() -> new TranslationNotFoundException(id));
+                .orElseThrow(() -> new TranslationNotFoundException(updatedTranslation.getId()));
     }
 
     public void delete(Long id) {

@@ -1,4 +1,4 @@
-package com.translaitor.service.dto;
+package com.translaitor.service.dto.user;
 
 import com.translaitor.model.User;
 import com.translaitor.model.UserRole;
@@ -20,7 +20,7 @@ public class UserDtoConverter {
                 .phoneNumber(user.getPhoneNumber())
                 .roles(user.getRoles().stream()
                         .map(UserRole::name)
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toList())
                 ).build();
     }
 

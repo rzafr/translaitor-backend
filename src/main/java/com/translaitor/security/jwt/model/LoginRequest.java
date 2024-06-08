@@ -1,19 +1,19 @@
 package com.translaitor.security.jwt.model;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LoginRequest {
 
-    @NotBlank
+    @NotEmpty
     private String username;
-    @NotBlank
+
+    @NotEmpty
     private String password;
 
 }

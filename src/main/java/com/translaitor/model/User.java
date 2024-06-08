@@ -1,9 +1,12 @@
 package com.translaitor.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -53,7 +55,9 @@ public class User implements UserDetails {
     // Save UserRole collection in another table in database
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles;
+    @JsonIgnore
+    @Fetch(FetchMode.SUBSELECT)
+    private List<UserRole> roles;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -61,7 +65,8 @@ public class User implements UserDetails {
     @Builder.Default
     private LocalDateTime lastPasswordChangeAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Translation> translations = new ArrayList<>();
 
     /**

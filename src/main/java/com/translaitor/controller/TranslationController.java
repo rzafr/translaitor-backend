@@ -3,12 +3,15 @@ package com.translaitor.controller;
 import com.translaitor.model.Translation;
 import com.translaitor.model.User;
 import com.translaitor.service.TranslationService;
+import com.translaitor.service.dto.translation.CreateTranslationDto;
+import com.translaitor.service.dto.translation.UpdateTranslationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -35,8 +38,8 @@ public class TranslationController {
     }
 
     @PostMapping("/translations")
-    public ResponseEntity<Translation> createTranslation(@RequestBody Translation translation) {
-        Translation createdTranslation = translationService.save(translation);
+    public ResponseEntity<Translation> createTranslation(@Valid @RequestBody CreateTranslationDto newTranslation) {
+        Translation createdTranslation = translationService.save(newTranslation);
         URI createdURI = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -47,9 +50,9 @@ public class TranslationController {
                 .body(createdTranslation);
     }
 
-    @PutMapping("/translations/{id}")
-    public Translation updateTranslation(@PathVariable Long id, @RequestBody Translation updatedTranslation) {
-        return translationService.updateTranslation(id, updatedTranslation);
+    @PutMapping("/translations")
+    public Translation updateTranslation(@Valid @RequestBody UpdateTranslationDto updatedTranslation) {
+        return translationService.updateTranslation(updatedTranslation);
     }
 
     @DeleteMapping("/translations/{id}")

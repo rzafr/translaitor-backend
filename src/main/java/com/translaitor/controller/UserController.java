@@ -1,12 +1,14 @@
 package com.translaitor.controller;
 
 import com.translaitor.service.UserService;
-import com.translaitor.service.dto.GetUserDto;
+import com.translaitor.service.dto.user.GetUserDto;
+import com.translaitor.service.dto.user.UpdateUserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +30,8 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<GetUserDto> updateUser(@RequestBody GetUserDto userDto) {
-        Optional<GetUserDto> getUserDto = userService.updateUser(userDto);
+    public ResponseEntity<GetUserDto> updateUser(@Valid @RequestBody UpdateUserDto updatedUser) {
+        Optional<GetUserDto> getUserDto = userService.updateUser(updatedUser);
         return !getUserDto.isPresent() ? ResponseEntity.notFound().build() : ResponseEntity.of(getUserDto);
     }
 

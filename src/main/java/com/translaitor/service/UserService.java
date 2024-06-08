@@ -4,9 +4,10 @@ import com.translaitor.exception.NewUserWithDifferentPasswordsException;
 import com.translaitor.model.User;
 import com.translaitor.model.UserRole;
 import com.translaitor.repository.UserRepository;
-import com.translaitor.service.dto.CreateUserDto;
-import com.translaitor.service.dto.GetUserDto;
-import com.translaitor.service.dto.UserDtoConverter;
+import com.translaitor.service.dto.user.CreateUserDto;
+import com.translaitor.service.dto.user.GetUserDto;
+import com.translaitor.service.dto.user.UpdateUserDto;
+import com.translaitor.service.dto.user.UserDtoConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -41,12 +42,12 @@ public class UserService {
                     .dateOfBirth(newUser.getDateOfBirth())
                     .email(newUser.getEmail())
                     .phoneNumber(newUser.getPhoneNumber())
-                    .roles(Set.of(UserRole.USER))
+                    .roles(List.of(UserRole.USER))
                     .build();
             try {
                 return userRepository.save(user);
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The username already exists", ex);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error saving user", ex);
             }
         } else {
             throw new NewUserWithDifferentPasswordsException();
@@ -73,17 +74,17 @@ public class UserService {
                 .findFirst();
     }
 
-    public Optional<GetUserDto> updateUser(GetUserDto getUserDto) {
-        User updatedUser = userRepository.findById(getUserDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + getUserDto.getId()));;
+    public Optional<GetUserDto> updateUser(UpdateUserDto updatedUser) {
+        User user = userRepository.findById(updatedUser.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + updatedUser.getId()));;
 
-        updatedUser.setFirstName(getUserDto.getFirstName());
-        updatedUser.setLastName(getUserDto.getLastName());
-        updatedUser.setDateOfBirth(getUserDto.getDateOfBirth());
-        updatedUser.setEmail(getUserDto.getEmail());
-        updatedUser.setPhoneNumber(getUserDto.getPhoneNumber());
+        user.setFirstName(updatedUser.getFirstName());
+        user.setLastName(updatedUser.getLastName());
+        user.setDateOfBirth(updatedUser.getDateOfBirth());
+        user.setEmail(updatedUser.getEmail());
+        user.setPhoneNumber(updatedUser.getPhoneNumber());
 
-        return Optional.ofNullable(userDtoConverter.convertUserToGetUserDto(userRepository.save(updatedUser)));
+        return Optional.ofNullable(userDtoConverter.convertUserToGetUserDto(userRepository.save(user)));
     }
 
     public void delete(User user) {

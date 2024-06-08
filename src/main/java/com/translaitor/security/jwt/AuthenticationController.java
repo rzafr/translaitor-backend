@@ -5,9 +5,9 @@ import com.translaitor.model.UserRole;
 import com.translaitor.security.jwt.model.JwtUserResponse;
 import com.translaitor.security.jwt.model.LoginRequest;
 import com.translaitor.service.UserService;
-import com.translaitor.service.dto.CreateUserDto;
-import com.translaitor.service.dto.GetUserDto;
-import com.translaitor.service.dto.UserDtoConverter;
+import com.translaitor.service.dto.user.CreateUserDto;
+import com.translaitor.service.dto.user.GetUserDto;
+import com.translaitor.service.dto.user.UserDtoConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ public class AuthenticationController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<JwtUserResponse> createUser(@RequestBody CreateUserDto newUser) {
+    public ResponseEntity<JwtUserResponse> createUser(@Valid @RequestBody CreateUserDto newUser) {
         try {
             userService.createUser(newUser);
             LoginRequest loginRequest = new LoginRequest(newUser.getUsername(), newUser.getPassword());
@@ -91,10 +91,9 @@ public class AuthenticationController {
                 .dateOfBirth(user.getDateOfBirth())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
-                .roles(user.getRoles().stream().map(UserRole::name).collect(Collectors.toSet()))
+                .roles(user.getRoles().stream().map(UserRole::name).collect(Collectors.toList()))
                 .token(jwtToken)
                 .build();
-
     }
 
 }
