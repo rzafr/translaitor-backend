@@ -10,13 +10,19 @@ import com.translaitor.service.dto.translation.CreateTranslationDto;
 import com.translaitor.service.dto.translation.UpdateTranslationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +39,12 @@ public class TranslationService {
         return result;
     }
 
+    public Page<Translation> findAllTranslationsPagedAndSorted(String[] sort, Integer page, Integer size) {
+        List<Order> orders = extractOrders(sort);
+        var pageable = PageRequest.of(page, size, Sort.by(orders));
+        return translationRepository.findAll(pageable);
+    }
+
     public List<Translation> findByUser(User user) {
         List<Translation> result = translationRepository.findByUser(user);
         if (result.isEmpty()) {
@@ -44,6 +56,10 @@ public class TranslationService {
     public Translation findById(Long id) {
         return translationRepository.findById(id)
                 .orElseThrow(() -> new TranslationNotFoundException(id));
+    }
+
+    public List<Translation> findByFavoriteTrueAndUserId(Long id) {
+        return translationRepository.findByFavoriteTrueAndUserId(id);
     }
 
     @Transactional
@@ -69,7 +85,7 @@ public class TranslationService {
 
     }
 
-    public Translation updateTranslation(UpdateTranslationDto updatedTranslation) {
+    public Translation update(UpdateTranslationDto updatedTranslation) {
         return translationRepository.findById(updatedTranslation.getId())
                 .map(translation -> {
                     translation.setFavorite(updatedTranslation.getFavorite());
@@ -81,6 +97,31 @@ public class TranslationService {
     public void delete(Long id) {
         if (translationRepository.existsById(id))
             translationRepository.deleteById(id);
+    }
+
+    /*
+    1 order
+    [0]: id
+    [1]: desc
+
+    multiples orders
+    [0]: id,desc
+    [1]: name,asc
+    [2]: email,desc
+     */
+    private List<Sort.Order> extractOrders(String[] sort) {
+        if(sort[0].contains(","))
+            return Arrays.stream(sort).map(this::extractOrder).collect(Collectors.toList());
+
+        return List.of(extractOrder(sort[0] + "," + sort[1]));
+    }
+
+    private Sort.Order extractOrder(String sort) {
+        System.out.println(sort);
+        String[] pair = sort.split(",");
+        String field = pair[0];
+        Sort.Direction direction = pair[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        return new Sort.Order(direction, field);
     }
 
 }

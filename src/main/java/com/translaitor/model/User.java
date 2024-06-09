@@ -65,7 +65,7 @@ public class User implements UserDetails {
     @Builder.Default
     private LocalDateTime lastPasswordChangeAt = LocalDateTime.now();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIgnore
     private List<Translation> translations = new ArrayList<>();
 

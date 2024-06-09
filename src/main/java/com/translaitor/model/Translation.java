@@ -1,5 +1,6 @@
 package com.translaitor.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +33,7 @@ public class Translation {
 
     @ManyToOne
     @JoinColumn(name = "id_user", foreignKey = @ForeignKey(name = "fk_user"))
+    @JsonIgnore
     private User user;
 
 }

@@ -10,6 +10,10 @@ import com.translaitor.service.dto.user.UpdateUserDto;
 import com.translaitor.service.dto.user.UserDtoConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +61,14 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(userDtoConverter::convertUserToGetUserDto)
                 .collect(Collectors.toList());
+    }
+
+    public Page<GetUserDto> findAllUsersPaged(Integer page, Integer size) {
+        Page<User> userPage = userRepository.findAll(PageRequest.of(page, size));
+        List<GetUserDto> userDtoList = userPage.stream()
+                .map(userDtoConverter::convertUserToGetUserDto)
+                .collect(Collectors.toList());
+        return new PageImpl<>(userDtoList, PageRequest.of(page, size), userPage.getTotalElements());
     }
 
     public Optional<User> findById(Long id) {

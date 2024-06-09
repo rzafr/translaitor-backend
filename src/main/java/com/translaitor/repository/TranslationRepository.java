@@ -12,4 +12,6 @@ public interface TranslationRepository extends JpaRepository<Translation, Long> 
 
     List<Translation> findByUser(User user);
 
+    List<Translation> findByFavoriteTrueAndUserId(Long id);
+
 }
