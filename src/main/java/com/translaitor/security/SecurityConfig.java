@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -58,7 +60,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-            .cors().and().csrf().disable()
+            .cors(withDefaults())
+            .csrf().disable()
             .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .and()
@@ -66,9 +69,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/auth/**").permitAll() // Only test
-                .antMatchers(HttpMethod.POST, "/auth/**").permitAll() // Only test
-                .antMatchers(HttpMethod.GET, "/auth/me", "/api/users/**", "/api/translations/**").permitAll() // Only test
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/api/auth/**").permitAll() // Only test
+                .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll() // Only test
+                .antMatchers(HttpMethod.GET, "/api/auth/me", "/api/users/**", "/api/translations/**").permitAll() // Only test
                 .antMatchers(HttpMethod.POST, "/api/translations/**").permitAll() // Only test
                 .antMatchers(HttpMethod.PUT, "/api/translations/**").permitAll() // Only test
                 .antMatchers(HttpMethod.DELETE, "/api/translations/**").permitAll() // Only test

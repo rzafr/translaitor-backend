@@ -13,7 +13,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class UserService {
                     .dateOfBirth(newUser.getDateOfBirth())
                     .email(newUser.getEmail())
                     .phoneNumber(newUser.getPhoneNumber())
-                    .roles(List.of(UserRole.USER))
+                    .roles(List.of(UserRole.ADMIN))
                     .build();
             try {
                 return userRepository.save(user);
