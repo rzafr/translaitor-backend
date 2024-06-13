@@ -25,7 +25,8 @@ import javax.validation.Valid;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
