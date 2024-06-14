@@ -21,10 +21,10 @@ public class JwtTokenProvider {
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String TOKEN_TYPE = "JWT ";
 
-    @Value("{jwt.secret}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("{jwt.token-expiration}")
+    @Value("${jwt.expiration}")
     private int jwtTokenDurationTokenInSeconds;
 
     public String generateToken(Authentication authentication) {
